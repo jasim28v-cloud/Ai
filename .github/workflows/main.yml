@@ -1,0 +1,353 @@
+name: 👑 Build APK - Dark AI Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: '📱 اسم التطبيق'
+        required: true
+        default: 'Dark AI'
+        type: string
+      app_id:
+        description: '🆔 App ID'
+        required: true
+        default: 'com.darkai.generator'
+        type: string
+      app_color:
+        description: '🎨 لون الخلفية'
+        required: true
+        default: '#000000'
+        type: string
+      version_name:
+        description: '📌 الإصدار'
+        required: false
+        default: '1.0.0'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: 👑 بناء Dark AI الفخم
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 تحميل المشروع
+        uses: actions/checkout@v4
+
+      - name: 🐍 إعداد Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🎨 تجهيز ملفات الموقع الفخم
+        run: python scraper.py
+
+      - name: 📋 عرض محتويات الموقع
+        run: |
+          echo "📁 محتويات مجلد www:"
+          ls -la www/
+          echo ""
+          echo "📊 حجم الموقع:"
+          du -sh www/
+
+      - name: ☕ تثبيت Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🟢 تثبيت Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 تثبيت الأدوات
+        run: |
+          npm install -g @capacitor/cli @capacitor/core @capacitor/android
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq imagemagick
+
+      - name: 📄 إنشاء package.json
+        run: |
+          cat > package.json << 'PACKAGEEOF'
+          {
+            "name": "dark-ai-generator",
+            "version": "1.0.0",
+            "description": "Dark AI Image Generator - فخم وأنيق",
+            "main": "www/index.html",
+            "scripts": {
+              "build": "echo 'Build complete'"
+            },
+            "dependencies": {
+              "@capacitor/android": "^5.0.0",
+              "@capacitor/core": "^5.0.0",
+              "@capacitor/cli": "^5.0.0",
+              "@capacitor/filesystem": "^5.0.0",
+              "@capacitor/app": "^5.0.0",
+              "@capacitor/status-bar": "^5.0.0",
+              "@capacitor/splash-screen": "^5.0.0"
+            }
+          }
+          PACKAGEEOF
+
+      - name: ⚙️ إعداد Capacitor
+        run: |
+          cat > capacitor.config.json << 'CAPEOF'
+          {
+            "appId": "${{ github.event.inputs.app_id }}",
+            "appName": "${{ github.event.inputs.app_name }}",
+            "webDir": "www",
+            "bundledWebRuntime": false,
+            "server": {
+              "androidScheme": "https",
+              "allowNavigation": ["*"],
+              "cleartext": true
+            },
+            "android": {
+              "allowMixedContent": true,
+              "captureInput": true,
+              "webContentsDebuggingEnabled": true,
+              "backgroundColor": "${{ github.event.inputs.app_color }}"
+            },
+            "plugins": {
+              "SplashScreen": {
+                "launchShowDuration": 2000,
+                "launchAutoHide": true,
+                "backgroundColor": "${{ github.event.inputs.app_color }}",
+                "androidSplashResourceName": "splash",
+                "androidScaleType": "CENTER_CROP",
+                "showSpinner": false,
+                "splashFullScreen": true,
+                "splashImmersive": true
+              },
+              "StatusBar": {
+                "style": "DARK",
+                "backgroundColor": "${{ github.event.inputs.app_color }}",
+                "overlaysWebView": true
+              }
+            }
+          }
+          CAPEOF
+
+      - name: 📦 تثبيت المكتبات
+        run: npm install
+
+      - name: 🤖 إنشاء مشروع Android
+        run: npx cap add android
+
+      - name: 🎨 إنشاء أيقونة ذهبية فاخرة
+        run: |
+          APP_COLOR="${{ github.event.inputs.app_color }}"
+          
+          # إنشاء المجلدات
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+          mkdir -p android/app/src/main/res/drawable
+          mkdir -p android/app/src/main/res/values
+          
+          echo "🎨 جاري إنشاء أيقونة ذهبية فاخرة..."
+          
+          # إنشاء أيقونة بأسلوب فخم - خلفية سوداء مع شكل ذهبي
+          for size in 192 144 96 72 48; do
+            folder="mipmap-xxxhdpi"
+            case $size in
+              144) folder="mipmap-xxhdpi" ;;
+              96) folder="mipmap-xhdpi" ;;
+              72) folder="mipmap-hdpi" ;;
+              48) folder="mipmap-mdpi" ;;
+            esac
+            
+            convert -size ${size}x${size} xc:"$APP_COLOR" \
+              -fill '#c9a84c' -draw "circle $(($size/2)),$(($size/2)) $(($size/2)),$(($size/4))" \
+              -fill '#000000' -font Courier-Bold -pointsize $(($size/4)) -gravity center \
+              -annotate +0+2 "AI" \
+              -alpha set -channel RGBA \
+              "android/app/src/main/res/${folder}/ic_launcher.png" 2>/dev/null
+            
+            convert -size ${size}x${size} xc:"$APP_COLOR" \
+              -fill '#c9a84c' -draw "roundrectangle $(($size/10)),$(($size/10)) $(($size-$size/10)),$(($size-$size/10)) $(($size/8)),$(($size/8))" \
+              -fill '#000000' -font Courier-Bold -pointsize $(($size/4)) -gravity center \
+              -annotate +0+2 "AI" \
+              "android/app/src/main/res/${folder}/ic_launcher_round.png" 2>/dev/null
+          done
+          
+          # أيقونة foreground للأندرويد الحديث
+          convert -size 192x192 xc:none \
+            -fill '#c9a84c' -draw "circle 96,96 96,48" \
+            -fill '#000000' -font Courier-Bold -pointsize 60 -gravity center \
+            -annotate +0+2 "AI" \
+            "android/app/src/main/res/drawable/ic_launcher_foreground.png" 2>/dev/null
+          
+          echo "✅ تم إنشاء الأيقونة الذهبية"
+
+      - name: 🎨 إنشاء Splash Screen فخم
+        run: |
+          APP_COLOR="${{ github.event.inputs.app_color }}"
+          
+          # Splash screen بصورة ذهبية فاخرة
+          convert -size 300x300 xc:"$APP_COLOR" \
+            -fill '#c9a84c' -draw "circle 150,150 150,75" \
+            -fill '#000000' -font Courier-Bold -pointsize 80 -gravity center \
+            -annotate +0+2 "AI" \
+            "android/app/src/main/res/drawable/splash.png" 2>/dev/null
+          
+          # splash_background.xml
+          cat > android/app/src/main/res/drawable/splash_background.xml << 'SPLASHEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+              <item>
+                  <shape>
+                      <solid android:color="SPLASHCOLOR" />
+                  </shape>
+              </item>
+              <item
+                  android:gravity="center"
+                  android:width="200dp"
+                  android:height="200dp">
+                  <bitmap
+                      android:src="@drawable/splash"
+                      android:gravity="center" />
+              </item>
+          </layer-list>
+          SPLASHEOF
+          sed -i "s|SPLASHCOLOR|${APP_COLOR}|g" android/app/src/main/res/drawable/splash_background.xml
+          
+          echo "✅ تم إنشاء Splash Screen الفخم"
+
+      - name: 🎨 إنشاء styles.xml و colors.xml
+        run: |
+          APP_COLOR="${{ github.event.inputs.app_color }}"
+          
+          # styles.xml
+          cat > android/app/src/main/res/values/styles.xml << 'STYLEEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+                  <item name="android:statusBarColor">APPCOLOR</item>
+                  <item name="android:navigationBarColor">APPCOLOR</item>
+                  <item name="android:windowBackground">APPCOLOR</item>
+                  <item name="android:windowFullscreen">true</item>
+              </style>
+              
+              <style name="AppTheme.Splash" parent="AppTheme">
+                  <item name="android:windowBackground">@drawable/splash_background</item>
+              </style>
+          </resources>
+          STYLEEOF
+          sed -i "s|APPCOLOR|${APP_COLOR}|g" android/app/src/main/res/values/styles.xml
+          
+          # colors.xml
+          cat > android/app/src/main/res/values/colors.xml << 'COLOREOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="windowBackground">APPCOLOR</color>
+              <color name="primaryColor">#c9a84c</color>
+              <color name="accentColor">#c9a84c</color>
+          </resources>
+          COLOREOF
+          sed -i "s|APPCOLOR|${APP_COLOR}|g" android/app/src/main/res/values/colors.xml
+          
+          echo "✅ تم إنشاء ملفات التنسيق"
+
+      - name: 🔧 إعداد AndroidManifest.xml
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          
+          if [ -f "$MANIFEST" ]; then
+            echo "📝 جاري تعديل AndroidManifest.xml..."
+            
+            # إضافة الصلاحيات
+            if ! grep -q "INTERNET" $MANIFEST; then
+              sed -i 's|</manifest>|    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>\n</manifest>|' $MANIFEST
+            fi
+            
+            # تعديل application
+            sed -i 's|<application|<application android:usesCleartextTraffic="true" android:hardwareAccelerated="true" android:theme="@style/AppTheme.Splash"|' $MANIFEST
+            
+            echo "✅ تم تعديل AndroidManifest.xml"
+          fi
+
+      - name: 🔄 مزامنة المشروع
+        run: npx cap sync android
+
+      - name: 🔨 بناء APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 📊 التحقق من الملف الناتج
+        run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$APK" ]; then
+            echo "✅ تم بناء APK بنجاح"
+            echo "📱 اسم التطبيق: ${{ github.event.inputs.app_name }}"
+            echo "📦 حجم الملف: $(du -h $APK | cut -f1)"
+            echo "🎨 التصميم: فخم - أسود × ذهبي"
+          else
+            echo "❌ فشل بناء APK"
+            exit 1
+          fi
+
+      - name: 📤 رفع إلى Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.inputs.app_name }}-v${{ github.event.inputs.version_name }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 90
+
+      - name: 🚀 إنشاء Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version_name }}-${{ github.run_number }}
+          name: "👑 ${{ github.event.inputs.app_name }} v${{ github.event.inputs.version_name }}"
+          body: |
+            ## 👑 Dark AI - Image Generator
+            
+            ### 🎨 تصميم فخم وجميل
+            
+            | الميزة | التفاصيل |
+            |--------|----------|
+            | 🎨 التصميم | أسود × ذهبي فاخر |
+            | 🤖 التقنية | Pollinations.ai |
+            | 🎭 الأنماط | 6 أنماط مختلفة |
+            | 📸 الجودة | 512×512 |
+            | 💰 السعر | مجاني بالكامل |
+            | 🔑 التسجيل | غير مطلوب |
+            
+            ### ✨ المميزات:
+            - ⚡ توليد صور غير محدود
+            - 🎨 6 أنماط فنية (Dark, Cyber, Anime, Real, Horror)
+            - 📥 تحميل الصور بنقرة واحدة
+            - 🌟 تصميم ذهبي فاخر
+            - 📱 متوافق مع جميع الأجهزة
+            
+            ### 📥 التحميل:
+            حمل ملف APK من الأسفل 👇
+            
+            ---
+            *Powered by Pollinations.ai • No API Key Required*
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🎉 اكتمال البناء
+        run: |
+          echo ""
+          echo "╔══════════════════════════════════════════╗"
+          echo "║  👑  تم بناء التطبيق الفخم بنجاح!      ║"
+          echo "║  🎨  Dark AI - Image Generator         ║"
+          echo "║  ✨  أسود × ذهبي - تصميم راقي         ║"
+          echo "╚══════════════════════════════════════════╝"
+          echo ""
+          echo "📥 التحميل متاح في:"
+          echo "  🚀 Releases"
+          echo "  📦 Artifacts"
