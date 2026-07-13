@@ -3,533 +3,712 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dark AI | Ultra</title>
+    <title>Dark AI | Legendary</title>
     <style>
         :root {
             --bg: #000000;
-            --surface: #0a0a0a;
+            --surface: #080808;
+            --card: #0d0d0d;
             --border: #1a1a1a;
             --gold: #c9a84c;
             --gold-light: #e2c97e;
-            --gold-glow: rgba(201, 168, 76, 0.4);
+            --gold-dark: #8b7300;
+            --gold-glow: rgba(201, 168, 76, 0.5);
             --text: #e0d5c0;
             --text-dim: #6b6355;
+            --text-light: #f5efe0;
+            --accent: #ff4444;
+            --accent-glow: rgba(255, 68, 68, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: var(--bg);
+            background: #000;
             color: var(--text);
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
             background-image: 
-                radial-gradient(ellipse at 20% 0%, rgba(201,168,76,0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(201,168,76,0.04) 0%, transparent 50%);
+                radial-gradient(ellipse at 30% 0%, rgba(201,168,76,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 100%, rgba(201,168,76,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139,115,0,0.03) 0%, transparent 80%);
+            overflow-x: hidden;
         }
 
-        .app { width: 100%; max-width: 440px; }
-
-        .header { text-align: center; margin-bottom: 20px; }
-
-        .logo-ring { width: 80px; height: 80px; margin: 0 auto 14px; position: relative; }
-
-        .logo-outer {
-            position: absolute; inset: -6px;
-            border: 2px solid rgba(201,168,76,0.2);
-            border-radius: 22px;
-            animation: pulse-ring 2s ease-in-out infinite;
+        .bg-particles {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
         }
 
-        .logo-inner {
+        .particle {
+            position: absolute; background: var(--gold);
+            border-radius: 50%; opacity: 0;
+            animation: floatUp 4s ease-in infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-10vh) scale(2); opacity: 0; }
+        }
+
+        .app { width: 100%; max-width: 450px; position: relative; z-index: 1; }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 20px; position: relative; }
+
+        .crown-icon {
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            font-size: 28px; animation: crownFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); }
+            25% { transform: translateX(-50%) translateY(-5px) rotate(-5deg); }
+            75% { transform: translateX(-50%) translateY(-3px) rotate(5deg); }
+        }
+
+        .logo-container {
+            width: 90px; height: 90px; margin: 0 auto 14px; position: relative;
+        }
+
+        .logo-outer-ring {
+            position: absolute; inset: -10px;
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 50%;
+            animation: outerSpin 20s linear infinite;
+        }
+
+        .logo-middle-ring {
+            position: absolute; inset: -5px;
+            border: 2px dashed rgba(201,168,76,0.2);
+            border-radius: 50%;
+            animation: outerSpin 15s linear infinite reverse;
+        }
+
+        @keyframes outerSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .logo-core {
             width: 100%; height: 100%;
-            background: linear-gradient(135deg, #000, #1a1a0a, #000);
+            background: radial-gradient(circle at 40% 40%, #1a1a0a, #000);
             border: 2px solid var(--gold);
-            border-radius: 20px;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 34px;
-            box-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(201,168,76,0.1), 0 8px 30px rgba(0,0,0,0.8);
-            animation: float 4s ease-in-out infinite;
-            position: relative; z-index: 2;
+            font-size: 38px;
+            box-shadow: 0 0 50px var(--gold-glow), 0 0 100px rgba(201,168,76,0.15), 0 0 0 4px rgba(0,0,0,0.8);
+            animation: logoPulse 3s ease-in-out infinite;
+            position: relative; z-index: 3;
         }
 
-        .sparkle {
-            position: absolute; width: 4px; height: 4px;
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 50px var(--gold-glow), 0 0 100px rgba(201,168,76,0.15); }
+            50% { box-shadow: 0 0 70px var(--gold-glow), 0 0 130px rgba(201,168,76,0.25); }
+        }
+
+        .logo-spark {
+            position: absolute; width: 3px; height: 3px;
             background: var(--gold-light); border-radius: 50%;
-            animation: sparkle 2s ease-in-out infinite; z-index: 3;
+            animation: sparkOrbit 3s ease-in-out infinite; z-index: 4;
         }
-        .sparkle:nth-child(1) { top: 8px; left: 8px; animation-delay: 0s; }
-        .sparkle:nth-child(2) { top: 12px; right: 10px; animation-delay: 0.6s; }
-        .sparkle:nth-child(3) { bottom: 10px; left: 14px; animation-delay: 1.2s; }
-        .sparkle:nth-child(4) { bottom: 8px; right: 8px; animation-delay: 1.8s; }
+        .logo-spark:nth-child(1) { top: 5px; left: 20px; animation-delay: 0s; }
+        .logo-spark:nth-child(2) { top: 15px; right: 8px; animation-delay: 0.5s; }
+        .logo-spark:nth-child(3) { bottom: 10px; left: 10px; animation-delay: 1s; }
+        .logo-spark:nth-child(4) { bottom: 5px; right: 18px; animation-delay: 1.5s; }
+        .logo-spark:nth-child(5) { top: 40px; left: 5px; animation-delay: 2s; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        @keyframes pulse-ring {
-            0%, 100% { transform: scale(1); opacity: 0.2; }
-            50% { transform: scale(1.12); opacity: 0.5; }
+        @keyframes sparkOrbit {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(2.5); }
         }
 
-        @keyframes sparkle {
-            0%, 100% { opacity: 0.2; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(2); }
-        }
+        .title-wrapper { position: relative; display: inline-block; }
 
         .title {
-            font-size: 34px; font-weight: 900; letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+            font-size: 36px; font-weight: 900; letter-spacing: 4px;
+            background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));
+            filter: drop-shadow(0 0 25px rgba(201,168,76,0.4)) drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+            text-transform: uppercase;
+        }
+
+        .title-glow {
+            position: absolute; bottom: -5px; left: 10%; right: 10%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+            filter: blur(2px);
         }
 
         .subtitle {
             font-size: 10px; color: var(--text-dim);
-            letter-spacing: 5px; text-transform: uppercase; margin-top: 2px;
+            letter-spacing: 6px; text-transform: uppercase; margin-top: 6px;
+            animation: subtitleShimmer 3s ease-in-out infinite;
         }
 
-        .line {
-            width: 60px; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            margin: 14px auto;
+        @keyframes subtitleShimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
 
+        .divider {
+            display: flex; align-items: center; gap: 10px;
+            margin: 16px auto; width: fit-content;
+        }
+
+        .divider-line {
+            width: 25px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold));
+        }
+
+        .divider-line:last-child {
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+
+        .divider-diamond { font-size: 8px; color: var(--gold); }
+
+        /* Card */
         .card {
-            background: var(--surface);
+            background: var(--card);
             border: 1px solid var(--border);
             border-radius: 24px; padding: 22px 18px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02) inset;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(255,255,255,0.02) inset,
+                0 0 100px rgba(201,168,76,0.03);
             position: relative; overflow: hidden;
         }
 
         .card::before {
-            content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+            content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), var(--gold), rgba(201,168,76,0.6), transparent);
         }
 
-        .styles-label {
-            font-size: 9px; text-transform: uppercase; letter-spacing: 4px;
+        .card::after {
+            content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+        }
+
+        /* Style Section */
+        .section-label {
+            font-size: 8px; text-transform: uppercase; letter-spacing: 5px;
             color: var(--text-dim); margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .section-label::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, rgba(201,168,76,0.3), transparent);
         }
 
         .styles-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 7px; margin-bottom: 18px;
+            gap: 8px; margin-bottom: 20px;
         }
 
         .style-btn {
-            padding: 12px 6px; background: var(--bg);
+            padding: 14px 8px; background: var(--bg);
             border: 1px solid var(--border); color: var(--text-dim);
-            cursor: pointer; border-radius: 12px;
+            cursor: pointer; border-radius: 14px;
             font-size: 10px; font-weight: 600;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center; position: relative; overflow: hidden;
         }
 
-        .style-btn .icon { display: block; font-size: 22px; margin-bottom: 5px; }
+        .style-btn .icon { display: block; font-size: 24px; margin-bottom: 6px; transition: 0.3s; }
 
-        .style-btn::after {
+        .style-btn::before {
             content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at center, rgba(201,168,76,0.1), transparent);
-            opacity: 0; transition: opacity 0.3s;
+            background: radial-gradient(circle at center, rgba(201,168,76,0.15), transparent);
+            opacity: 0; transition: opacity 0.4s;
         }
 
-        .style-btn:hover { border-color: var(--gold); color: var(--gold); }
-        .style-btn:hover::after { opacity: 1; }
+        .style-btn:hover { border-color: #444; color: #aaa; }
+        .style-btn:hover .icon { transform: scale(1.2); }
+        .style-btn:hover::before { opacity: 1; }
 
         .style-btn.active {
-            background: rgba(201,168,76,0.12);
+            background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
             border-color: var(--gold); color: var(--gold);
-            box-shadow: 0 0 20px var(--gold-glow), 0 0 0 2px rgba(201,168,76,0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--gold-glow), 0 0 0 3px rgba(201,168,76,0.08);
+            transform: translateY(-3px);
         }
 
-        .input-wrapper { position: relative; margin-bottom: 12px; }
+        .style-btn.active .icon { animation: iconBounce 0.6s ease; }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+        }
+
+        /* Input */
+        .input-group { margin-bottom: 14px; }
+
+        .input-wrapper { position: relative; }
 
         #prompt {
-            width: 100%; padding: 16px 20px; padding-right: 50px;
+            width: 100%; padding: 16px 55px 16px 20px;
             background: var(--bg); border: 1px solid var(--border);
-            color: var(--text); font-size: 14px; border-radius: 14px;
+            color: var(--text); font-size: 14px; border-radius: 16px;
             transition: all 0.4s; outline: none; font-family: inherit;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3) inset;
         }
 
         #prompt:focus {
             border-color: var(--gold);
-            box-shadow: 0 0 0 4px var(--gold-glow), 0 0 30px rgba(201,168,76,0.1);
+            box-shadow: 0 0 0 5px var(--gold-glow), 0 0 40px rgba(201,168,76,0.1), 0 4px 15px rgba(0,0,0,0.3) inset;
+            color: var(--text-light);
         }
 
         #prompt::placeholder { color: #3a3530; }
 
-        .input-icon {
+        .input-icon-right {
             position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-            font-size: 18px; opacity: 0.3; pointer-events: none;
+            font-size: 20px; pointer-events: none; transition: 0.3s;
         }
 
+        #prompt:focus ~ .input-icon-right { opacity: 1; transform: translateY(-50%) scale(1.2); }
+
+        .prompt-suggestions {
+            display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            padding: 6px 12px; background: rgba(201,168,76,0.05);
+            border: 1px solid rgba(201,168,76,0.2); color: var(--text-dim);
+            cursor: pointer; border-radius: 20px; font-size: 9px;
+            letter-spacing: 1px; transition: all 0.3s; white-space: nowrap;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(201,168,76,0.12); border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Generate Button */
         .btn-generate {
-            width: 100%; padding: 16px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+            width: 100%; padding: 17px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold), var(--gold-dark));
+            background-size: 200% 200%;
             color: #000; border: none; font-weight: 900;
-            cursor: pointer; border-radius: 14px;
-            font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 6px 25px var(--gold-glow);
-            margin-bottom: 18px; font-family: inherit;
+            cursor: pointer; border-radius: 16px;
+            font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px var(--gold-glow), 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px; font-family: inherit;
             position: relative; overflow: hidden;
+            animation: gradientShift 4s ease-in-out infinite;
         }
 
-        .btn-generate::before {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            width: 0; height: 0; background: rgba(255,255,255,0.3);
-            border-radius: 50%; transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
-        .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 12px 35px var(--gold-glow); }
-        .btn-generate:hover::before { width: 300px; height: 300px; }
-        .btn-generate:active { transform: scale(0.95); }
+        .btn-generate::after {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2), transparent 70%);
+            opacity: 0; transition: opacity 0.5s;
+        }
+
+        .btn-generate:hover { transform: translateY(-4px); box-shadow: 0 15px 40px var(--gold-glow); }
+        .btn-generate:hover::after { opacity: 1; }
+        .btn-generate:active { transform: scale(0.94); }
 
         .btn-generate:disabled {
             background: #1a1a1a; color: #333;
             box-shadow: none; cursor: not-allowed; transform: none;
+            animation: none;
         }
 
-        .btn-generate:disabled::before { display: none; }
+        .btn-generate:disabled::after { display: none; }
 
-        .image-area { position: relative; margin-bottom: 14px; }
+        /* Image Area */
+        .image-area { margin-bottom: 16px; }
 
         .image-frame {
             width: 100%; aspect-ratio: 1;
             background: var(--bg); border: 1px solid var(--border);
-            border-radius: 18px; overflow: hidden; position: relative;
+            border-radius: 20px; overflow: hidden; position: relative;
             display: flex; align-items: center; justify-content: center;
-            transition: all 0.4s;
+            transition: all 0.5s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) inset;
         }
 
-        .image-frame.has-image { border-color: #333; }
+        .image-frame.has-image {
+            border-color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) inset, 0 0 40px rgba(201,168,76,0.08);
+        }
 
-        .placeholder-content { text-align: center; color: #1a1a1a; }
-        .placeholder-content .icon { font-size: 56px; display: block; margin-bottom: 10px; opacity: 0.25; }
-        .placeholder-content .text { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
+        .placeholder-content { text-align: center; color: #111; }
+        .placeholder-content .ph-icon { font-size: 60px; display: block; margin-bottom: 12px; opacity: 0.2; }
+        .placeholder-content .ph-text { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.4; }
 
         .image-frame img {
             width: 100%; height: 100%; object-fit: cover;
-            display: none; transition: opacity 0.5s;
+            display: none; transition: opacity 0.6s;
         }
 
-        .image-frame img.show { display: block; animation: fadeIn 0.6s ease; }
+        .image-frame img.show { display: block; animation: imageReveal 0.8s ease; }
 
-        .image-frame canvas {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; display: none;
+        @keyframes imageReveal {
+            from { opacity: 0; transform: scale(1.08); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
-        .image-frame canvas.show { display: block; animation: fadeIn 0.6s ease; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(1.05); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
+        /* Loading */
         .loading-overlay {
             display: none; position: absolute; inset: 0;
-            background: rgba(0,0,0,0.92); border-radius: 18px;
+            background: rgba(0,0,0,0.95); border-radius: 20px;
             align-items: center; justify-content: center;
-            flex-direction: column; gap: 16px; z-index: 10;
+            flex-direction: column; gap: 20px; z-index: 10;
         }
 
         .loading-overlay.show { display: flex; }
 
-        .spinner-ring {
-            width: 50px; height: 50px;
-            border: 2px solid var(--border);
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .spinner-luxury {
+            width: 60px; height: 60px; position: relative;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .loading-dots { display: flex; gap: 6px; }
-        .loading-dot {
-            width: 6px; height: 6px; background: var(--gold);
-            border-radius: 50%; animation: bounce 1.2s ease-in-out infinite;
-        }
-        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); opacity: 0.3; }
-            50% { transform: translateY(-12px); opacity: 1; }
+        .spinner-luxury .ring {
+            position: absolute; inset: 0;
+            border: 2px solid transparent; border-radius: 50%;
+            animation: spinRing 2s linear infinite;
         }
 
+        .spinner-luxury .ring:nth-child(1) { border-top-color: var(--gold); animation-duration: 1s; }
+        .spinner-luxury .ring:nth-child(2) { inset: 8px; border-right-color: var(--gold-light); animation-duration: 1.5s; animation-direction: reverse; }
+        .spinner-luxury .ring:nth-child(3) { inset: 16px; border-bottom-color: var(--gold); animation-duration: 2s; }
+
+        @keyframes spinRing { to { transform: rotate(360deg); } }
+
+        .loading-status {
+            font-size: 10px; letter-spacing: 3px; color: var(--gold);
+            animation: statusPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Download Button */
         .btn-download {
-            display: none; width: 100%; padding: 14px;
+            display: none; width: 100%; padding: 15px;
             background: transparent; border: 2px solid var(--gold);
-            color: var(--gold); cursor: pointer; border-radius: 14px;
-            font-weight: 700; font-size: 13px; letter-spacing: 2px;
+            color: var(--gold); cursor: pointer; border-radius: 16px;
+            font-weight: 700; font-size: 13px; letter-spacing: 3px;
             text-transform: uppercase; transition: all 0.4s;
             font-family: inherit; position: relative; overflow: hidden;
         }
 
-        .btn-download.visible { display: block; animation: slideUp 0.4s ease; }
+        .btn-download.visible { display: block; animation: btnSlideIn 0.5s ease; }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
+        @keyframes btnSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .btn-download:hover {
-            background: rgba(201,168,76,0.12);
-            box-shadow: 0 0 30px var(--gold-glow);
-            letter-spacing: 3px;
+        .btn-download::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
+            transition: left 0.5s;
         }
 
-        .btn-download:active { transform: scale(0.96); }
+        .btn-download:hover { background: rgba(201,168,76,0.1); box-shadow: 0 0 35px var(--gold-glow); }
+        .btn-download:hover::before { left: 100%; }
+        .btn-download:active { transform: scale(0.95); }
 
+        .btn-download .icon-dl { margin-right: 8px; }
+
+        /* Toast */
         .toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #111; border: 1px solid var(--gold);
-            color: var(--gold); padding: 14px 28px;
-            border-radius: 30px; font-size: 12px; letter-spacing: 2px;
-            z-index: 200; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 30px var(--gold-glow);
-            text-align: center;
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(120px);
+            background: #0a0a0a; border: 1px solid var(--gold);
+            color: var(--gold); padding: 16px 30px; border-radius: 40px;
+            font-size: 12px; letter-spacing: 2px; z-index: 999;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 40px var(--gold-glow);
+            text-align: center; white-space: nowrap;
         }
 
         .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: #4caf50; color: #4caf50; box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 40px rgba(76,175,80,0.3); }
+        .toast.error { border-color: #ff4444; color: #ff4444; box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 40px rgba(255,68,68,0.3); }
 
+        /* Footer */
         .footer {
-            text-align: center; margin-top: 18px;
-            font-size: 9px; color: #1a1a1a; letter-spacing: 2px;
+            text-align: center; margin-top: 20px;
+            font-size: 9px; color: #111; letter-spacing: 3px;
         }
         .footer span { color: var(--gold); }
+        .footer .dot { color: var(--gold); margin: 0 6px; }
     </style>
 </head>
 <body>
+    <!-- Particles Background -->
+    <div class="bg-particles" id="particles"></div>
+
     <div class="app">
+        <!-- Header -->
         <div class="header">
-            <div class="logo-ring">
-                <div class="logo-outer"></div>
-                <div class="logo-inner">
+            <div class="crown-icon">👑</div>
+            <div class="logo-container">
+                <div class="logo-outer-ring"></div>
+                <div class="logo-middle-ring"></div>
+                <div class="logo-core">
                     ⚡
-                    <span class="sparkle"></span>
-                    <span class="sparkle"></span>
-                    <span class="sparkle"></span>
-                    <span class="sparkle"></span>
+                    <span class="logo-spark"></span>
+                    <span class="logo-spark"></span>
+                    <span class="logo-spark"></span>
+                    <span class="logo-spark"></span>
+                    <span class="logo-spark"></span>
                 </div>
             </div>
-            <h1 class="title">DARK AI</h1>
-            <p class="subtitle">Image Generator Ultra</p>
-            <div class="line"></div>
+            <div class="title-wrapper">
+                <h1 class="title">DARK AI</h1>
+                <div class="title-glow"></div>
+            </div>
+            <p class="subtitle">✦ Legendary Edition ✦</p>
+            <div class="divider">
+                <span class="divider-line"></span>
+                <span class="divider-diamond">◆</span>
+                <span class="divider-line"></span>
+            </div>
         </div>
 
+        <!-- Card -->
         <div class="card">
-            <p class="styles-label">✦ Select Style</p>
+            <!-- Style Selection -->
+            <p class="section-label">✦ Choose Style</p>
             <div class="styles-grid">
                 <button class="style-btn active" data-style="">
-                    <span class="icon">🎨</span>All
+                    <span class="icon">🎨</span>All Styles
                 </button>
-                <button class="style-btn" data-style="dark fantasy art">
-                    <span class="icon">🌑</span>Dark
+                <button class="style-btn" data-style="dark fantasy art, intricate details">
+                    <span class="icon">🌑</span>Dark Fantasy
                 </button>
-                <button class="style-btn" data-style="cyberpunk neon">
-                    <span class="icon">🤖</span>Cyber
+                <button class="style-btn" data-style="cyberpunk neon, futuristic">
+                    <span class="icon">🤖</span>Cyberpunk
                 </button>
-                <button class="style-btn" data-style="anime art style">
+                <button class="style-btn" data-style="anime art style, studio ghibli">
                     <span class="icon">🌸</span>Anime
                 </button>
-                <button class="style-btn" data-style="photorealistic 8k">
-                    <span class="icon">👤</span>Real
+                <button class="style-btn" data-style="photorealistic, 8k, highly detailed">
+                    <span class="icon">👤</span>Realistic
                 </button>
-                <button class="style-btn" data-style="horror dark gothic">
+                <button class="style-btn" data-style="horror dark gothic, creepy">
                     <span class="icon">💀</span>Horror
                 </button>
             </div>
 
-            <div class="input-wrapper">
-                <input type="text" id="prompt" placeholder="Describe your vision..." autocomplete="off">
-                <span class="input-icon">✨</span>
+            <!-- Prompt Input -->
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="text" id="prompt" placeholder="Describe your masterpiece..." autocomplete="off" maxlength="200">
+                    <span class="input-icon-right">✨</span>
+                </div>
+                <div class="prompt-suggestions">
+                    <span class="suggestion-chip" onclick="setPrompt('dragon in golden armor')">🐉 Dragon</span>
+                    <span class="suggestion-chip" onclick="setPrompt('futuristic city at night')">🌃 Cyber City</span>
+                    <span class="suggestion-chip" onclick="setPrompt('beautiful cosmic galaxy')">🌌 Galaxy</span>
+                    <span class="suggestion-chip" onclick="setPrompt('ancient egyptian temple')">🏛️ Temple</span>
+                </div>
             </div>
 
+            <!-- Generate Button -->
             <button class="btn-generate" id="generateBtn" onclick="generateImage()">
-                ✦ Generate Image ✦
+                ✦ Generate Masterpiece ✦
             </button>
 
+            <!-- Image Area -->
             <div class="image-area">
                 <div class="image-frame" id="imageFrame">
                     <div class="placeholder-content" id="placeholder">
-                        <span class="icon">🖼️</span>
-                        <span class="text">Masterpiece appears here</span>
+                        <span class="ph-icon">🎨</span>
+                        <span class="ph-text">Your Art Awaits</span>
                     </div>
-                    <img id="generatedImage" alt="AI Art" crossorigin="anonymous">
-                    <canvas id="imageCanvas"></canvas>
+                    <img id="generatedImage" alt="AI Masterpiece">
                     <div class="loading-overlay" id="loadingOverlay">
-                        <div class="spinner-ring"></div>
-                        <div class="loading-dots">
-                            <div class="loading-dot"></div>
-                            <div class="loading-dot"></div>
-                            <div class="loading-dot"></div>
+                        <div class="spinner-luxury">
+                            <div class="ring"></div>
+                            <div class="ring"></div>
+                            <div class="ring"></div>
                         </div>
+                        <span class="loading-status">CREATING MAGIC...</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Download Button -->
             <button class="btn-download" id="downloadBtn" onclick="downloadImage()">
-                ⬇ Download Image
+                <span class="icon-dl">⬇</span> Download Masterpiece
             </button>
         </div>
 
-        <p class="footer">Powered by <span>Pollinations.ai</span> • Free & Unlimited</p>
+        <!-- Footer -->
+        <p class="footer">
+            <span>◆</span> Powered by <span>Pollinations.ai</span> <span class="dot">•</span> Free <span class="dot">•</span> Unlimited <span>◆</span>
+        </p>
     </div>
 
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        let currentStyle = '';
-        let currentDataUrl = null;
+        // ==================== PARTICLES ====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = (Math.random() * 3 + 1) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDuration = (Math.random() * 6 + 4) + 's';
+                particle.style.animationDelay = (Math.random() * 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
 
+        // ==================== STATE ====================
+        let currentStyle = '';
+        let currentImageUrl = null;
+
+        // ==================== STYLE SELECTION ====================
         document.querySelectorAll('.style-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentStyle = this.dataset.style;
+                // Re-trigger icon animation
+                const icon = this.querySelector('.icon');
+                icon.style.animation = 'none';
+                icon.offsetHeight;
+                icon.style.animation = 'iconBounce 0.6s ease';
             });
         });
+
+        // ==================== PROMPT ====================
+        function setPrompt(text) {
+            document.getElementById('prompt').value = text;
+            document.getElementById('prompt').focus();
+        }
 
         document.getElementById('prompt').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') generateImage();
         });
 
-        function showToast(msg) {
+        // ==================== TOAST ====================
+        function showToast(msg, type = '') {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // ==================== GENERATE IMAGE ====================
         function generateImage() {
             const prompt = document.getElementById('prompt').value.trim();
             if (!prompt) {
                 const input = document.getElementById('prompt');
                 input.style.borderColor = '#ff4444';
-                input.style.boxShadow = '0 0 15px rgba(255,0,0,0.3)';
-                setTimeout(() => {
-                    input.style.borderColor = '';
-                    input.style.boxShadow = '';
-                }, 1500);
+                input.style.boxShadow = '0 0 0 5px rgba(255,68,68,0.2), 0 0 30px rgba(255,68,68,0.1)';
+                showToast('⚠️ Please enter a description', 'error');
+                setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 2000);
                 return;
             }
 
             const fullPrompt = currentStyle ? prompt + ', ' + currentStyle : prompt;
             const seed = Math.floor(Math.random() * 99999);
-            const imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) + '?width=512&height=512&seed=' + seed + '&nologo=true';
+            const imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) + '?width=512&height=512&seed=' + seed + '&nologo=true&enhance=true';
 
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const generatedImage = document.getElementById('generatedImage');
-            const imageCanvas = document.getElementById('imageCanvas');
-            const placeholder = document.getElementById('placeholder');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const generateBtn = document.getElementById('generateBtn');
-            const imageFrame = document.getElementById('imageFrame');
+            currentImageUrl = imageUrl;
 
-            loadingOverlay.classList.add('show');
-            generateBtn.disabled = true;
-            generatedImage.classList.remove('show');
-            imageCanvas.classList.remove('show');
-            placeholder.style.display = 'block';
-            downloadBtn.classList.remove('visible');
-            imageFrame.classList.remove('has-image');
-            currentDataUrl = null;
-
-            generatedImage.crossOrigin = 'anonymous';
-            generatedImage.src = imageUrl;
-
-            generatedImage.onload = function() {
-                try {
-                    const canvas = document.getElementById('imageCanvas');
-                    const ctx = canvas.getContext('2d');
-
-                    canvas.width = generatedImage.naturalWidth || 512;
-                    canvas.height = generatedImage.naturalHeight || 512;
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(generatedImage, 0, 0, canvas.width, canvas.height);
-
-                    currentDataUrl = canvas.toDataURL('image/png');
-
-                    imageCanvas.classList.add('show');
-                    generatedImage.classList.remove('show');
-                } catch (e) {
-                    generatedImage.classList.add('show');
-                    imageCanvas.classList.remove('show');
-                    currentDataUrl = imageUrl;
-                }
-
-                loadingOverlay.classList.remove('show');
-                placeholder.style.display = 'none';
-                downloadBtn.classList.add('visible');
-                generateBtn.disabled = false;
-                imageFrame.classList.add('has-image');
+            const elements = {
+                loadingOverlay: document.getElementById('loadingOverlay'),
+                generatedImage: document.getElementById('generatedImage'),
+                placeholder: document.getElementById('placeholder'),
+                downloadBtn: document.getElementById('downloadBtn'),
+                generateBtn: document.getElementById('generateBtn'),
+                imageFrame: document.getElementById('imageFrame')
             };
 
-            generatedImage.onerror = function() {
-                loadingOverlay.classList.remove('show');
-                generateBtn.disabled = false;
-                showToast('⚠️ Failed. Try a different prompt.');
+            // Reset
+            elements.loadingOverlay.classList.add('show');
+            elements.generateBtn.disabled = true;
+            elements.generatedImage.classList.remove('show');
+            elements.placeholder.style.display = 'block';
+            elements.downloadBtn.classList.remove('visible');
+            elements.imageFrame.classList.remove('has-image');
+
+            // Load image
+            elements.generatedImage.src = imageUrl;
+
+            elements.generatedImage.onload = function() {
+                elements.loadingOverlay.classList.remove('show');
+                elements.generatedImage.classList.add('show');
+                elements.placeholder.style.display = 'none';
+                elements.downloadBtn.classList.add('visible');
+                elements.generateBtn.disabled = false;
+                elements.imageFrame.classList.add('has-image');
+                showToast('✨ Masterpiece created!', 'success');
+            };
+
+            elements.generatedImage.onerror = function() {
+                elements.loadingOverlay.classList.remove('show');
+                elements.generateBtn.disabled = false;
+                showToast('❌ Failed. Please try again.', 'error');
             };
         }
 
-        function downloadImage() {
-            if (!currentDataUrl) {
-                showToast('⚠️ No image to download');
+        // ==================== DOWNLOAD IMAGE ====================
+        async function downloadImage() {
+            if (!currentImageUrl) {
+                showToast('⚠️ No image to download', 'error');
                 return;
             }
 
             const btn = document.getElementById('downloadBtn');
-            btn.textContent = 'Saving...';
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Downloading...';
             btn.disabled = true;
 
-            const filename = 'Dark-AI-' + Date.now() + '.png';
-
             try {
-                if (currentDataUrl.startsWith('data:image/png')) {
-                    const a = document.createElement('a');
-                    a.href = currentDataUrl;
-                    a.download = filename;
-                    a.style.display = 'none';
-                    document.body.appendChild(a);
-                    a.click();
-
-                    setTimeout(function() {
-                        document.body.removeChild(a);
-                    }, 200);
-
-                    showToast('✅ Image saved successfully!');
-                } else {
-                    window.open(currentDataUrl, '_blank');
-                    showToast('📤 Image opened in new tab');
-                }
+                // Fetch image as blob
+                const response = await fetch(currentImageUrl);
+                const blob = await response.blob();
+                
+                // Create blob URL and download
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = 'Dark-AI-' + Date.now() + '.png';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(blobUrl);
+                }, 300);
+                
+                showToast('✅ Downloaded successfully!', 'success');
             } catch (e) {
-                window.open(currentDataUrl, '_blank');
-                showToast('📤 Long-press to save image');
+                // Fallback: open in new tab
+                window.open(currentImageUrl, '_blank');
+                showToast('📤 Image opened in new tab');
             }
 
-            btn.textContent = '⬇ Download Image';
+            btn.innerHTML = originalText;
             btn.disabled = false;
         }
-
-        document.getElementById('generatedImage').addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            downloadImage();
-        });
     </script>
 </body>
 </html>
