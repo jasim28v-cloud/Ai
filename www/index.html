@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dark AI Generator</title>
+    <title>Dark AI | Ultra</title>
     <style>
         :root {
             --bg: #000000;
@@ -11,7 +11,7 @@
             --border: #1a1a1a;
             --gold: #c9a84c;
             --gold-light: #e2c97e;
-            --gold-glow: rgba(201, 168, 76, 0.3);
+            --gold-glow: rgba(201, 168, 76, 0.4);
             --text: #e0d5c0;
             --text-dim: #6b6355;
         }
@@ -28,228 +28,230 @@
             justify-content: center;
             padding: 16px;
             background-image: 
-                radial-gradient(ellipse at top, rgba(201,168,76,0.05) 0%, transparent 60%),
-                radial-gradient(ellipse at bottom, rgba(201,168,76,0.03) 0%, transparent 60%);
+                radial-gradient(ellipse at 20% 0%, rgba(201,168,76,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(201,168,76,0.04) 0%, transparent 50%);
         }
 
-        .app {
-            width: 100%;
-            max-width: 440px;
-        }
+        .app { width: 100%; max-width: 440px; }
 
         /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+        .header { text-align: center; margin-bottom: 20px; }
+
+        .logo-ring {
+            width: 80px; height: 80px; margin: 0 auto 14px;
+            position: relative;
         }
 
-        .logo {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 12px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 0 30px var(--gold-glow);
-            animation: float 3s ease-in-out infinite;
+        .logo-outer {
+            position: absolute; inset: -6px;
+            border: 2px solid rgba(201,168,76,0.2);
+            border-radius: 22px;
+            animation: pulse-ring 2s ease-in-out infinite;
         }
+
+        .logo-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #000, #1a1a0a, #000);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 34px;
+            box-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(201,168,76,0.1), 0 8px 30px rgba(0,0,0,0.8);
+            animation: float 4s ease-in-out infinite;
+            position: relative; z-index: 2;
+        }
+
+        .sparkle {
+            position: absolute; width: 4px; height: 4px;
+            background: var(--gold-light); border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite; z-index: 3;
+        }
+        .sparkle:nth-child(1) { top: 8px; left: 8px; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 12px; right: 10px; animation-delay: 0.6s; }
+        .sparkle:nth-child(3) { bottom: 10px; left: 14px; animation-delay: 1.2s; }
+        .sparkle:nth-child(4) { bottom: 8px; right: 8px; animation-delay: 1.8s; }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.12); opacity: 0.5; }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(2); }
         }
 
         .title {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: 2px;
+            font-size: 34px; font-weight: 900; letter-spacing: 3px;
             background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));
         }
 
         .subtitle {
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-top: 2px;
+            font-size: 10px; color: var(--text-dim);
+            letter-spacing: 5px; text-transform: uppercase; margin-top: 2px;
         }
 
         .line {
-            width: 50px;
-            height: 1px;
+            width: 60px; height: 1px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            margin: 12px auto;
+            margin: 14px auto;
         }
 
         /* Card */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 24px; padding: 22px 18px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02) inset;
+            position: relative; overflow: hidden;
         }
 
-        /* Styles */
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+        }
+
+        /* Style Buttons */
         .styles-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--text-dim);
-            margin-bottom: 10px;
+            font-size: 9px; text-transform: uppercase; letter-spacing: 4px;
+            color: var(--text-dim); margin-bottom: 10px;
         }
 
         .styles-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 16px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 7px; margin-bottom: 18px;
         }
 
         .style-btn {
-            padding: 10px 6px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            cursor: pointer;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-align: center;
+            padding: 12px 6px; background: var(--bg);
+            border: 1px solid var(--border); color: var(--text-dim);
+            cursor: pointer; border-radius: 12px;
+            font-size: 10px; font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center; position: relative; overflow: hidden;
         }
 
-        .style-btn .icon { display: block; font-size: 20px; margin-bottom: 4px; }
+        .style-btn .icon { display: block; font-size: 22px; margin-bottom: 5px; }
 
-        .style-btn:hover {
-            border-color: var(--gold);
-            color: var(--gold);
+        .style-btn::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at center, rgba(201,168,76,0.1), transparent);
+            opacity: 0; transition: opacity 0.3s;
         }
+
+        .style-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .style-btn:hover::after { opacity: 1; }
 
         .style-btn.active {
-            background: rgba(201,168,76,0.1);
-            border-color: var(--gold);
-            color: var(--gold);
-            box-shadow: 0 0 15px var(--gold-glow);
+            background: rgba(201,168,76,0.12);
+            border-color: var(--gold); color: var(--gold);
+            box-shadow: 0 0 20px var(--gold-glow), 0 0 0 2px rgba(201,168,76,0.1);
+            transform: translateY(-2px);
         }
 
         /* Input */
+        .input-wrapper { position: relative; margin-bottom: 12px; }
+
         #prompt {
-            width: 100%;
-            padding: 14px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 13px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-            outline: none;
+            width: 100%; padding: 16px 20px; padding-right: 50px;
+            background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); font-size: 14px; border-radius: 14px;
+            transition: all 0.4s; outline: none; font-family: inherit;
         }
 
         #prompt:focus {
             border-color: var(--gold);
-            box-shadow: 0 0 0 3px var(--gold-glow);
+            box-shadow: 0 0 0 4px var(--gold-glow), 0 0 30px rgba(201,168,76,0.1);
         }
 
         #prompt::placeholder { color: #3a3530; }
 
+        .input-icon {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            font-size: 18px; opacity: 0.3; pointer-events: none;
+        }
+
         /* Generate Button */
         .btn-generate {
-            width: 100%;
-            padding: 14px;
+            width: 100%; padding: 16px;
             background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
-            color: #000;
-            border: none;
-            font-weight: 900;
-            cursor: pointer;
-            border-radius: 12px;
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px var(--gold-glow);
-            margin-bottom: 16px;
+            color: #000; border: none; font-weight: 900;
+            cursor: pointer; border-radius: 14px;
+            font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 25px var(--gold-glow);
+            margin-bottom: 18px; font-family: inherit;
+            position: relative; overflow: hidden;
         }
 
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--gold-glow);
+        .btn-generate::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 0; height: 0; background: rgba(255,255,255,0.3);
+            border-radius: 50%; transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
 
-        .btn-generate:active { transform: scale(0.98); }
+        .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 12px 35px var(--gold-glow); }
+        .btn-generate:hover::before { width: 300px; height: 300px; }
+        .btn-generate:active { transform: scale(0.95); }
 
         .btn-generate:disabled {
-            background: #1a1a1a;
-            color: #333;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
+            background: #1a1a1a; color: #333;
+            box-shadow: none; cursor: not-allowed; transform: none;
         }
+
+        .btn-generate:disabled::before { display: none; }
 
         /* Image Area */
+        .image-area { position: relative; margin-bottom: 14px; }
+
         .image-frame {
-            width: 100%;
-            aspect-ratio: 1;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%; aspect-ratio: 1;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 18px; overflow: hidden; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.4s;
         }
 
-        .placeholder-content {
-            text-align: center;
-            color: #1a1a1a;
-        }
+        .image-frame.has-image { border-color: #333; }
 
-        .placeholder-content .icon {
-            font-size: 50px;
-            display: block;
-            margin-bottom: 8px;
-            opacity: 0.3;
-        }
-
-        .placeholder-content .text {
-            font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        .placeholder-content { text-align: center; color: #1a1a1a; }
+        .placeholder-content .icon { font-size: 56px; display: block; margin-bottom: 10px; opacity: 0.25; }
+        .placeholder-content .text { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
 
         .image-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
+            width: 100%; height: 100%; object-fit: cover;
+            display: none; transition: opacity 0.5s;
+        }
+
+        .image-frame img.show { display: block; animation: fadeIn 0.6s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* Loading */
         .loading-overlay {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            border-radius: 16px;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 12px;
+            display: none; position: absolute; inset: 0;
+            background: rgba(0,0,0,0.92); border-radius: 18px;
+            align-items: center; justify-content: center;
+            flex-direction: column; gap: 16px; z-index: 10;
         }
 
         .loading-overlay.show { display: flex; }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
+        .spinner-ring {
+            width: 50px; height: 50px;
             border: 2px solid var(--border);
             border-top-color: var(--gold);
             border-radius: 50%;
@@ -258,64 +260,86 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .loading-text {
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: var(--gold);
-            animation: pulse 1.5s ease-in-out infinite;
+        .loading-dots { display: flex; gap: 6px; }
+        .loading-dot {
+            width: 6px; height: 6px; background: var(--gold);
+            border-radius: 50%; animation: bounce 1.2s ease-in-out infinite;
         }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); opacity: 0.3; }
+            50% { transform: translateY(-12px); opacity: 1; }
         }
 
         /* Download */
         .btn-download {
-            display: none;
-            width: 100%;
-            margin-top: 12px;
-            padding: 12px;
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            cursor: pointer;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 12px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s;
+            display: none; width: 100%; padding: 14px;
+            background: transparent; border: 2px solid var(--gold);
+            color: var(--gold); cursor: pointer; border-radius: 14px;
+            font-weight: 700; font-size: 13px; letter-spacing: 2px;
+            text-transform: uppercase; transition: all 0.4s;
+            font-family: inherit; position: relative; overflow: hidden;
         }
 
-        .btn-download.visible { display: block; }
+        .btn-download.visible { display: block; animation: slideUp 0.4s ease; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .btn-download:hover {
-            background: rgba(201,168,76,0.1);
-            box-shadow: 0 0 20px var(--gold-glow);
+            background: rgba(201,168,76,0.12);
+            box-shadow: 0 0 30px var(--gold-glow);
+            letter-spacing: 3px;
         }
+
+        .btn-download:active { transform: scale(0.96); }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #111; border: 1px solid var(--gold);
+            color: var(--gold); padding: 14px 28px;
+            border-radius: 30px; font-size: 12px; letter-spacing: 2px;
+            z-index: 200; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 30px var(--gold-glow);
+            text-align: center;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
         /* Footer */
         .footer {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 9px;
-            color: #1a1a1a;
-            letter-spacing: 2px;
+            text-align: center; margin-top: 18px;
+            font-size: 9px; color: #1a1a1a; letter-spacing: 2px;
         }
-
         .footer span { color: var(--gold); }
     </style>
 </head>
 <body>
     <div class="app">
+        <!-- Header -->
         <div class="header">
-            <div class="logo">⚡</div>
+            <div class="logo-ring">
+                <div class="logo-outer"></div>
+                <div class="logo-inner">
+                    ⚡
+                    <span class="sparkle"></span>
+                    <span class="sparkle"></span>
+                    <span class="sparkle"></span>
+                    <span class="sparkle"></span>
+                </div>
+            </div>
             <h1 class="title">DARK AI</h1>
-            <p class="subtitle">Image Generator</p>
+            <p class="subtitle">Image Generator Ultra</p>
             <div class="line"></div>
         </div>
 
+        <!-- Card -->
         <div class="card">
             <p class="styles-label">✦ Select Style</p>
             <div class="styles-grid">
@@ -339,35 +363,48 @@
                 </button>
             </div>
 
-            <input type="text" id="prompt" placeholder="Describe your image..." autocomplete="off">
+            <div class="input-wrapper">
+                <input type="text" id="prompt" placeholder="Describe your vision..." autocomplete="off">
+                <span class="input-icon">✨</span>
+            </div>
 
             <button class="btn-generate" id="generateBtn" onclick="generateImage()">
-                ✦ Generate ✦
+                ✦ Generate Image ✦
             </button>
 
-            <div class="image-frame" id="imageFrame">
-                <div class="placeholder-content" id="placeholder">
-                    <span class="icon">🖼️</span>
-                    <span class="text">Your art appears here</span>
-                </div>
-                <img id="generatedImage" alt="Generated">
-                <div class="loading-overlay" id="loadingOverlay">
-                    <div class="spinner"></div>
-                    <span class="loading-text">Creating...</span>
+            <div class="image-area">
+                <div class="image-frame" id="imageFrame">
+                    <div class="placeholder-content" id="placeholder">
+                        <span class="icon">🖼️</span>
+                        <span class="text">Masterpiece appears here</span>
+                    </div>
+                    <img id="generatedImage" alt="AI Art">
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="spinner-ring"></div>
+                        <div class="loading-dots">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <button class="btn-download" id="downloadBtn" onclick="downloadImage()">
-                ⬇ Save Image
+                ⬇ Download Image
             </button>
         </div>
 
         <p class="footer">Powered by <span>Pollinations.ai</span> • Free & Unlimited</p>
     </div>
 
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
     <script>
         let currentImage = null;
         let currentStyle = '';
+        let generatedBlobUrl = null;
 
         // Style buttons
         document.querySelectorAll('.style-btn').forEach(btn => {
@@ -388,7 +425,11 @@
             if (!prompt) {
                 const input = document.getElementById('prompt');
                 input.style.borderColor = '#ff4444';
-                setTimeout(() => input.style.borderColor = '', 1500);
+                input.style.boxShadow = '0 0 15px rgba(255,0,0,0.3)';
+                setTimeout(() => {
+                    input.style.borderColor = '';
+                    input.style.boxShadow = '';
+                }, 1500);
                 return;
             }
 
@@ -401,60 +442,151 @@
             const placeholder = document.getElementById('placeholder');
             const downloadBtn = document.getElementById('downloadBtn');
             const generateBtn = document.getElementById('generateBtn');
+            const imageFrame = document.getElementById('imageFrame');
 
-            // Show loading
+            // Reset
             loadingOverlay.classList.add('show');
             generateBtn.disabled = true;
-            generatedImage.style.display = 'none';
+            generatedImage.classList.remove('show');
             placeholder.style.display = 'block';
-
-            generatedImage.src = imageUrl;
+            downloadBtn.classList.remove('visible');
+            imageFrame.classList.remove('has-image');
             
-            generatedImage.onload = function() {
-                loadingOverlay.classList.remove('show');
-                generatedImage.style.display = 'block';
-                placeholder.style.display = 'none';
-                downloadBtn.classList.add('visible');
-                generateBtn.disabled = false;
+            // Revoke old blob
+            if (generatedBlobUrl) {
+                URL.revokeObjectURL(generatedBlobUrl);
+                generatedBlobUrl = null;
+            }
+
+            // Preload image as blob for guaranteed download
+            try {
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                generatedBlobUrl = URL.createObjectURL(blob);
+                
+                generatedImage.src = generatedBlobUrl;
+                currentImage = generatedBlobUrl;
+                
+                generatedImage.onload = function() {
+                    loadingOverlay.classList.remove('show');
+                    generatedImage.classList.add('show');
+                    placeholder.style.display = 'none';
+                    downloadBtn.classList.add('visible');
+                    generateBtn.disabled = false;
+                    imageFrame.classList.add('has-image');
+                };
+            } catch (e) {
+                // Fallback: direct URL
+                generatedImage.src = imageUrl;
                 currentImage = imageUrl;
-            };
+                
+                generatedImage.onload = function() {
+                    loadingOverlay.classList.remove('show');
+                    generatedImage.classList.add('show');
+                    placeholder.style.display = 'none';
+                    downloadBtn.classList.add('visible');
+                    generateBtn.disabled = false;
+                    imageFrame.classList.add('has-image');
+                };
+            }
 
             generatedImage.onerror = function() {
                 loadingOverlay.classList.remove('show');
                 generateBtn.disabled = false;
-                alert('Failed to generate. Please try again.');
+                showToast('⚠️ Failed. Try a different prompt.');
             };
         }
 
+        // ⭐ DOWNLOAD - Multiple methods for APK compatibility
         async function downloadImage() {
             if (!currentImage) return;
             
             const btn = document.getElementById('downloadBtn');
-            btn.textContent = 'Saving...';
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '⏳ Saving...';
             btn.disabled = true;
             
-            try {
-                const response = await fetch(currentImage);
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `dark-ai-${Date.now()}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                btn.textContent = '✦ Saved! ✦';
-            } catch (e) {
-                window.open(currentImage, '_blank');
-                btn.textContent = '⬇ Save Image';
+            const filename = 'Dark-AI-' + Date.now() + '.png';
+            
+            // Method 1: Blob URL download (works best in WebView)
+            if (generatedBlobUrl) {
+                try {
+                    const a = document.createElement('a');
+                    a.href = generatedBlobUrl;
+                    a.download = filename;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                    }, 100);
+                    
+                    showToast('✅ Image saved!');
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    return;
+                } catch (e) {
+                    console.log('Method 1 failed, trying method 2...');
+                }
             }
             
-            setTimeout(() => {
-                btn.textContent = '⬇ Save Image';
+            // Method 2: Canvas to Data URL
+            try {
+                const img = document.getElementById('generatedImage');
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || 512;
+                canvas.height = img.naturalHeight || 512;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const dataUrl = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                }, 100);
+                
+                showToast('✅ Image saved!');
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
-            }, 2000);
+                return;
+            } catch (e) {
+                console.log('Method 2 failed, trying method 3...');
+            }
+            
+            // Method 3: Open in new tab (last resort)
+            try {
+                window.open(currentImage, '_blank');
+                showToast('📤 Image opened in new tab');
+            } catch (e) {
+                showToast('⚠️ Long-press image to save');
+            }
+            
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
         }
+
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Long press fallback for mobile
+        document.getElementById('generatedImage').addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            if (currentImage) {
+                downloadImage();
+            }
+        });
     </script>
 </body>
 </html>
