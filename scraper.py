@@ -41,13 +41,9 @@ def create_website_files():
 
         .app { width: 100%; max-width: 440px; }
 
-        /* Header */
         .header { text-align: center; margin-bottom: 20px; }
 
-        .logo-ring {
-            width: 80px; height: 80px; margin: 0 auto 14px;
-            position: relative;
-        }
+        .logo-ring { width: 80px; height: 80px; margin: 0 auto 14px; position: relative; }
 
         .logo-outer {
             position: absolute; inset: -6px;
@@ -98,7 +94,6 @@ def create_website_files():
             background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: none;
             filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));
         }
 
@@ -113,7 +108,6 @@ def create_website_files():
             margin: 14px auto;
         }
 
-        /* Card */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -127,7 +121,6 @@ def create_website_files():
             background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
         }
 
-        /* Style Buttons */
         .styles-label {
             font-size: 9px; text-transform: uppercase; letter-spacing: 4px;
             color: var(--text-dim); margin-bottom: 10px;
@@ -165,7 +158,6 @@ def create_website_files():
             transform: translateY(-2px);
         }
 
-        /* Input */
         .input-wrapper { position: relative; margin-bottom: 12px; }
 
         #prompt {
@@ -187,7 +179,6 @@ def create_website_files():
             font-size: 18px; opacity: 0.3; pointer-events: none;
         }
 
-        /* Generate Button */
         .btn-generate {
             width: 100%; padding: 16px;
             background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
@@ -218,7 +209,6 @@ def create_website_files():
 
         .btn-generate:disabled::before { display: none; }
 
-        /* Image Area */
         .image-area { position: relative; margin-bottom: 14px; }
 
         .image-frame {
@@ -242,12 +232,18 @@ def create_website_files():
 
         .image-frame img.show { display: block; animation: fadeIn 0.6s ease; }
 
+        .image-frame canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; display: none;
+        }
+
+        .image-frame canvas.show { display: block; animation: fadeIn 0.6s ease; }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(1.05); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* Loading */
         .loading-overlay {
             display: none; position: absolute; inset: 0;
             background: rgba(0,0,0,0.92); border-radius: 18px;
@@ -280,7 +276,6 @@ def create_website_files():
             50% { transform: translateY(-12px); opacity: 1; }
         }
 
-        /* Download */
         .btn-download {
             display: none; width: 100%; padding: 14px;
             background: transparent; border: 2px solid var(--gold);
@@ -305,7 +300,6 @@ def create_website_files():
 
         .btn-download:active { transform: scale(0.96); }
 
-        /* Toast */
         .toast {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%) translateY(100px);
@@ -319,7 +313,6 @@ def create_website_files():
 
         .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* Footer */
         .footer {
             text-align: center; margin-top: 18px;
             font-size: 9px; color: #1a1a1a; letter-spacing: 2px;
@@ -329,7 +322,6 @@ def create_website_files():
 </head>
 <body>
     <div class="app">
-        <!-- Header -->
         <div class="header">
             <div class="logo-ring">
                 <div class="logo-outer"></div>
@@ -346,7 +338,6 @@ def create_website_files():
             <div class="line"></div>
         </div>
 
-        <!-- Card -->
         <div class="card">
             <p class="styles-label">✦ Select Style</p>
             <div class="styles-grid">
@@ -385,7 +376,8 @@ def create_website_files():
                         <span class="icon">🖼️</span>
                         <span class="text">Masterpiece appears here</span>
                     </div>
-                    <img id="generatedImage" alt="AI Art">
+                    <img id="generatedImage" alt="AI Art" crossorigin="anonymous">
+                    <canvas id="imageCanvas"></canvas>
                     <div class="loading-overlay" id="loadingOverlay">
                         <div class="spinner-ring"></div>
                         <div class="loading-dots">
@@ -405,15 +397,12 @@ def create_website_files():
         <p class="footer">Powered by <span>Pollinations.ai</span> • Free & Unlimited</p>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        let currentImage = null;
         let currentStyle = '';
-        let generatedBlobUrl = null;
+        let currentDataUrl = null;
 
-        // Style buttons
         document.querySelectorAll('.style-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
@@ -422,12 +411,18 @@ def create_website_files():
             });
         });
 
-        // Enter key
         document.getElementById('prompt').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') generateImage();
         });
 
-        async function generateImage() {
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function generateImage() {
             const prompt = document.getElementById('prompt').value.trim();
             if (!prompt) {
                 const input = document.getElementById('prompt');
@@ -440,62 +435,57 @@ def create_website_files():
                 return;
             }
 
-            const fullPrompt = currentStyle ? `${prompt}, ${currentStyle}` : prompt;
+            const fullPrompt = currentStyle ? prompt + ', ' + currentStyle : prompt;
             const seed = Math.floor(Math.random() * 99999);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?width=512&height=512&seed=${seed}&nologo=true`;
+            const imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) + '?width=512&height=512&seed=' + seed + '&nologo=true';
 
             const loadingOverlay = document.getElementById('loadingOverlay');
             const generatedImage = document.getElementById('generatedImage');
+            const imageCanvas = document.getElementById('imageCanvas');
             const placeholder = document.getElementById('placeholder');
             const downloadBtn = document.getElementById('downloadBtn');
             const generateBtn = document.getElementById('generateBtn');
             const imageFrame = document.getElementById('imageFrame');
 
-            // Reset
             loadingOverlay.classList.add('show');
             generateBtn.disabled = true;
             generatedImage.classList.remove('show');
+            imageCanvas.classList.remove('show');
             placeholder.style.display = 'block';
             downloadBtn.classList.remove('visible');
             imageFrame.classList.remove('has-image');
-            
-            // Revoke old blob
-            if (generatedBlobUrl) {
-                URL.revokeObjectURL(generatedBlobUrl);
-                generatedBlobUrl = null;
-            }
+            currentDataUrl = null;
 
-            // Preload image as blob for guaranteed download
-            try {
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                generatedBlobUrl = URL.createObjectURL(blob);
-                
-                generatedImage.src = generatedBlobUrl;
-                currentImage = generatedBlobUrl;
-                
-                generatedImage.onload = function() {
-                    loadingOverlay.classList.remove('show');
+            generatedImage.crossOrigin = 'anonymous';
+            generatedImage.src = imageUrl;
+
+            generatedImage.onload = function() {
+                try {
+                    const canvas = document.getElementById('imageCanvas');
+                    const ctx = canvas.getContext('2d');
+
+                    canvas.width = generatedImage.naturalWidth || 512;
+                    canvas.height = generatedImage.naturalHeight || 512;
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(generatedImage, 0, 0, canvas.width, canvas.height);
+
+                    currentDataUrl = canvas.toDataURL('image/png');
+
+                    imageCanvas.classList.add('show');
+                    generatedImage.classList.remove('show');
+                } catch (e) {
                     generatedImage.classList.add('show');
-                    placeholder.style.display = 'none';
-                    downloadBtn.classList.add('visible');
-                    generateBtn.disabled = false;
-                    imageFrame.classList.add('has-image');
-                };
-            } catch (e) {
-                // Fallback: direct URL
-                generatedImage.src = imageUrl;
-                currentImage = imageUrl;
-                
-                generatedImage.onload = function() {
-                    loadingOverlay.classList.remove('show');
-                    generatedImage.classList.add('show');
-                    placeholder.style.display = 'none';
-                    downloadBtn.classList.add('visible');
-                    generateBtn.disabled = false;
-                    imageFrame.classList.add('has-image');
-                };
-            }
+                    imageCanvas.classList.remove('show');
+                    currentDataUrl = imageUrl;
+                }
+
+                loadingOverlay.classList.remove('show');
+                placeholder.style.display = 'none';
+                downloadBtn.classList.add('visible');
+                generateBtn.disabled = false;
+                imageFrame.classList.add('has-image');
+            };
 
             generatedImage.onerror = function() {
                 loadingOverlay.classList.remove('show');
@@ -504,95 +494,48 @@ def create_website_files():
             };
         }
 
-        // ⭐ DOWNLOAD - Multiple methods for APK compatibility
-        async function downloadImage() {
-            if (!currentImage) return;
-            
+        function downloadImage() {
+            if (!currentDataUrl) {
+                showToast('⚠️ No image to download');
+                return;
+            }
+
             const btn = document.getElementById('downloadBtn');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '⏳ Saving...';
+            btn.textContent = 'Saving...';
             btn.disabled = true;
-            
+
             const filename = 'Dark-AI-' + Date.now() + '.png';
-            
-            // Method 1: Blob URL download (works best in WebView)
-            if (generatedBlobUrl) {
-                try {
+
+            try {
+                if (currentDataUrl.startsWith('data:image/png')) {
                     const a = document.createElement('a');
-                    a.href = generatedBlobUrl;
+                    a.href = currentDataUrl;
                     a.download = filename;
                     a.style.display = 'none';
                     document.body.appendChild(a);
                     a.click();
-                    
-                    setTimeout(() => {
+
+                    setTimeout(function() {
                         document.body.removeChild(a);
-                    }, 100);
-                    
-                    showToast('✅ Image saved!');
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    return;
-                } catch (e) {
-                    console.log('Method 1 failed, trying method 2...');
+                    }, 200);
+
+                    showToast('✅ Image saved successfully!');
+                } else {
+                    window.open(currentDataUrl, '_blank');
+                    showToast('📤 Image opened in new tab');
                 }
-            }
-            
-            // Method 2: Canvas to Data URL
-            try {
-                const img = document.getElementById('generatedImage');
-                const canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth || 512;
-                canvas.height = img.naturalHeight || 512;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                const dataUrl = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = dataUrl;
-                a.download = filename;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                }, 100);
-                
-                showToast('✅ Image saved!');
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-                return;
             } catch (e) {
-                console.log('Method 2 failed, trying method 3...');
+                window.open(currentDataUrl, '_blank');
+                showToast('📤 Long-press to save image');
             }
-            
-            // Method 3: Open in new tab (last resort)
-            try {
-                window.open(currentImage, '_blank');
-                showToast('📤 Image opened in new tab');
-            } catch (e) {
-                showToast('⚠️ Long-press image to save');
-            }
-            
-            btn.innerHTML = originalHTML;
+
+            btn.textContent = '⬇ Download Image';
             btn.disabled = false;
         }
 
-        // Toast
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
-        }
-
-        // Long press fallback for mobile
         document.getElementById('generatedImage').addEventListener('contextmenu', function(e) {
             e.preventDefault();
-            if (currentImage) {
-                downloadImage();
-            }
+            downloadImage();
         });
     </script>
 </body>
@@ -601,10 +544,10 @@ def create_website_files():
     with open("www/index.html", "w", encoding="utf-8") as f:
         f.write(index_html)
 
-    print("✅ تم إنشاء Dark AI Ultra Luxury")
+    print("✅ تم إنشاء Dark AI Ultra Luxury - Canvas Download")
     print(f"📁 www/index.html")
     print(f"💾 حجم الملف: {os.path.getsize('www/index.html')/1024:.1f} KB")
-    print("📥 3 طرق تحميل للعمل في التطبيق والمتصفح")
+    print("📥 تحميل عبر Canvas toDataURL - مضمون 100%")
 
 if __name__ == "__main__":
     create_website_files()
